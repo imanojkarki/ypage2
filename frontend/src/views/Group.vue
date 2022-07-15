@@ -13,7 +13,7 @@
               <span class="input-group-text text-danger btn2" @click.prevent="handleDelete(r, i)">
                 <i :class="config.Icon_Delete"></i></span>
               <input type="text" class="form-control form-control-sm" v-model="r.group" maxlength="15" minlength="2"
-                placeholder="group name" />
+                placeholder="group name" autocomplete="off" />
               <span class="input-group-text btn2"
                 :class="r.group.length > 2 ? 'text-success pointer' : 'text-secondary disabled'"
                 @click.prevent="handleSave(r, i)"><i :class="config.Icon_Save"></i></span>
@@ -23,7 +23,7 @@
             <div class="input-group input-group-sm">
               <span class="input-group-text btn2"><i :class="config.Icon_Group"></i></span>
               <input type="text" class="form-control form-control-sm" v-model="model.group" maxlength="15" minlength="2"
-                placeholder="group name" />
+                placeholder="group name" ref="focusRef" />
               <span class="input-group-text btn2"
                 :class="model.group.length > 1 ? 'text-success pointer' : 'text-secondary disabled'"
                 @click.prevent="handleSave(model, -1)"><i :class="config.Icon_Save"></i></span>
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import Alertbox2 from "../components/Alertbox2.vue";
 import config from "../composables/config.js"
 
@@ -52,7 +52,11 @@ const handleDelete = (form, i) => {
   if (confirm(`${config.MSG_Delete} ${form.group}`)) emit('onSaveData', config.ICRUD_Delete, form, i, msg2setter)
 }
 const handleSave = (form, i) => emit('onSaveData', i === -1 ? config.ICRUD_Create : config.ICRUD_Update, form, i, msg2setter)
- 
+
+const focusRef = ref(null)
+const focusX = () => setTimeout(() => { focusRef.value.focus()}, 333)
+
+defineExpose({focusX})
 </script>
 
 <style scoped>

@@ -5,18 +5,18 @@
     </a>
     <SearchwithShowAll v-show="yPage.dbset.contacts && yPage.dbset.contacts.length > 1" :isfilter="hasFilter"
       @filterClicked="showAll" @filterText="showText"></SearchwithShowAll>
-    <SelectGroup @formGroupClicked="showModalGroup = true" @selectOnChange="viewByGroup" :groups="yPage.dbset.groups"
+    <SelectGroup @formGroupClicked="openModalGroup" @selectOnChange="viewByGroup" :groups="yPage.dbset.groups"
       :groupid="filterGroupID"></SelectGroup>
   </div>
   <AlphaNumericButton @alphanumClicked="viewByAlphaNum"></AlphaNumericButton>
 
-  <Directory :recordset="yPage.directory" @rowContactClicked="initModalContact"></Directory>
+  <Directory :recordset="yPage.directory" @rowContactClicked="openModalContact"></Directory>
 
   <Teleport to="#form">
     <Group v-show="showModalGroup" :recordset="yPage.dbset.groups" @onSaveData="onChangeGroup"
-      @close="showModalGroup = false"></Group>
+      @close="showModalGroup = false" ref="refGroup"></Group>
     <Contact v-show="showModalContact" :slug="yPage.slug" :groups="yPage.dbset.groups" @getContact="getContactBySlug"
-      @onSaveData="onChangePhone" @close="handleCloseModalContact"></Contact>
+      @onSaveData="onChangePhone" @close="handleCloseModalContact" ref="refContact"></Contact>
   </Teleport>
 
 
@@ -41,6 +41,8 @@ const yPage = reactive({
 
 const showModalGroup = ref(false)
 const showModalContact = ref(false)
+const refGroup = ref()
+const refContact = ref()
 
 const hasFilter = ref(false)
 const filterText = ref('')
@@ -49,6 +51,13 @@ const filterGroupID = ref(0)
 Format Document (Shift+Alt+F) - Format the entire active file. Format Selection (Ctrl+K Ctrl+F) - Format the selected text.
 On Windows Shift + Alt + F On Mac Shift + Option + F On Linux Ctrl + Shift + I
 */
+
+const openModalGroup = () => {
+  showModalContact.value = false
+  showModalGroup.value = true
+  refGroup.value.focusX()
+}
+
 const viewByAlphaNum = (v, isAlpha = true) => {
   hasFilter.value = true
   filterText.value = v
@@ -101,11 +110,15 @@ const populate_contact = async (contacts) => {
 
 onMounted(() => apps_init().then(() => populate_contact(yPage.dbset.contacts)))
 
-const initModalContact = (slug, el) => {
+const openModalContact = (slug, el) => {
   showModalContact.value = true
   yPage.el = el
   if (el > -1) yPage.directory[el].is_highlight = true
   yPage.slug = slug
+
+  showModalGroup.value = false
+  refContact.value.focusX()
+
 }
 
 const getContactBySlug = (slug, row) => {

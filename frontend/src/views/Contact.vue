@@ -16,11 +16,11 @@
               <div class="card-body p-1">
                 <div class="input-group input-group-sm mb-1">
                   <input type="text" class="form-control" name="name" v-model="model.contact.name" maxlength="50"
-                    minlength="2" placeholder="Name" />
+                    minlength="2" placeholder="Name" ref="focusRef" autocomplete="off" />
                 </div>
                 <div class="input-group input-group-sm mb-1">
                   <input type="text" class="form-control" name="address" v-model="model.contact.address" maxlength="50"
-                    minlength="2" placeholder="address" />
+                    minlength="2" placeholder="address" autocomplete="off" />
                 </div>
               </div>
             </div>
@@ -40,8 +40,8 @@
               <div class="card-header fw-bold p-1"><i :class="config.Icon_Mobile"></i> Phone No </div>
               <div class="card-body p-1">
                 <div class="input-group input-group-sm mb-1" v-for="(r, i) in model.phones" :key="i">
-                  <input type="text" class="form-control" v-model="model.phones[i]" maxlength="10" minlength="2"
-                    placeholder="landline/mobile" />
+                  <input type="text" class="form-control phone" v-model="model.phones[i]" maxlength="10" minlength="2"
+                    placeholder="landline/mobile" @keyup.alt.enter="handleAdd()" autocomplete="off" />
                   <span class="input-group-text text-danger btn2" v-show="i > 0" @click.prevent="handleDelete(i)"><i
                       :class="config.Icon_Delete"></i></span>
                   <span class="input-group-text btn2" v-show="i === 0" @click.prevent="handleAdd()"><i
@@ -71,7 +71,7 @@
 
 <script setup>
 
-import { reactive, watchEffect } from "vue";
+import { reactive, watchEffect, ref } from "vue";
 import Alertbox2 from "../components/Alertbox2.vue";
 import config from "../composables/config.js"
 
@@ -90,7 +90,14 @@ const msg2setter = (text, el) => { msg2.el = el, msg2.text = text }
 watchEffect(() => emit('getContact', props.slug, model))
 
 const handleDelete = (i) => model.phones.splice(i, 1)
-const handleAdd = () => model.phones.push('')
+
+const handleAdd = () => { 
+  model.phones.push('')
+  setTimeout(() => {
+    const nodeList = document.querySelectorAll('.phone')
+    nodeList[nodeList.length-1].focus()
+  },111)
+}
 
 const handleSubmit = (is_continue, is_deleted) => { // icrud, row, callback
   let ishttp_post = true
@@ -106,6 +113,11 @@ const handleSubmit = (is_continue, is_deleted) => { // icrud, row, callback
   if (!is_continue) setTimeout(() => emit('close'), 2222)
 
 }
+
+const focusRef = ref(null)
+const focusX = () => setTimeout(() => { focusRef.value.focus()}, 333)
+
+defineExpose({focusX})
 
 </script>
 
